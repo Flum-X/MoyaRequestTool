@@ -1,0 +1,13 @@
+source "https://github.com/CocoaPods/Specs.git"
+
+platform :ios, “13.0”
+use_frameworks!
+
+# 忽略引入库的所有警告
+inhibit_all_warnings!
+
+target ‘MoyaRequestTool’ do
+pod 'Moya', '~> 14.0'
+pod 'SwiftyJSON'
+pod 'HandyJSON', '~> 5.0.2'
+end
