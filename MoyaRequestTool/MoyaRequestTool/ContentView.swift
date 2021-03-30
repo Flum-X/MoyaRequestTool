@@ -38,7 +38,7 @@ struct ContentView: View {
         params["offset"] = 0
         params["limit"] = 20
 
-        netWorkRequest(.basicAPI(parameters: params), completion: { (responseStr) in
+        netWorkRequest(.basicPostAPI(parameters: params), completion: { (responseStr) in
 
             print(responseStr)
         }, failed: { (failedRes) in

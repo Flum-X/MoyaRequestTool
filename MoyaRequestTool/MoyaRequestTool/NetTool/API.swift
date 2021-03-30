@@ -8,30 +8,39 @@
 
 import Foundation
 import Moya
+import Alamofire
+
+//Get请求参数编码
+struct BracketLessGetEncoding: ParameterEncoding {
+    
+    func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
+        var request = try URLEncoding().encode(urlRequest, with: parameters)
+        request.url = URL(string: request.url!.absoluteString.replacingOccurrences(of: "%5B%5D=", with: "="))
+        return request
+    }
+}
 
 enum Module1API {
     
-    case basicAPI(parameters:[String:Any])
     case easyAPI
+    case basicGetAPI(parameters:[String:Any])
+    case basicPostAPI(parameters:[String:Any])
 }
 
 
 extension Module1API: TargetType {
     
     var baseURL: URL {
-        switch self {
-        case .basicAPI:
-            return URL.init(string: "https://tv-api.shike.co/")!
-        case .easyAPI:
-            return URL.init(string: "https://tv-api.shike.co/")!
-        } //"https://news-at.zhihu.com/api/"
+        return URL(string: moyaBaseUrl)!
     }
     
     var path: String {
         switch self {
         case .easyAPI:
-            return "channels/362/members" //"4/news/latest"
-        default:
+            return "channels/362/members"
+        case .basicGetAPI:
+            return "channel/audience"
+        case .basicPostAPI :
             return "channel/audience"
         }
     }
@@ -40,7 +49,9 @@ extension Module1API: TargetType {
         switch self {
         case .easyAPI:
             return .get
-        default:
+        case .basicGetAPI:
+            return .get
+        case .basicPostAPI:
             return .post
         }
     }
@@ -53,7 +64,9 @@ extension Module1API: TargetType {
         switch self {
         case .easyAPI:
             return .requestPlain
-        case let .basicAPI(parameters: params):
+        case let .basicGetAPI(parameters: params):
+            return .requestParameters(parameters: params, encoding: BracketLessGetEncoding())
+        case let .basicPostAPI(parameters: params):
             return .requestParameters(parameters: params, encoding: JSONEncoding.default)
         }
     }
