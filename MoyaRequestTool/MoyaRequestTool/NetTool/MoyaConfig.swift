@@ -13,7 +13,7 @@ enum Environment {
     case test
     case offical
 }
-
+//环境变量
 let enviroment: Environment = .offical
 
 //定义基础域名

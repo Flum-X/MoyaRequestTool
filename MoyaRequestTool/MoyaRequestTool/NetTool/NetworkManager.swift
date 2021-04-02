@@ -89,7 +89,7 @@ func netWorkRequest(_ target: Module1API, completion: @escaping successCallback,
     netWorkRequest(target, completion: completion, failed: failed, errorResult: nil)
 }
 
-@discardableResult
+@discardableResult //用于禁止显示 Result unused 警告的一个属性
 func netWorkRequest(_ target: Module1API, completion: @escaping successCallback, failed: failureCallback?, errorResult: errorCallback?) -> Cancellable? {
     
     if !UIDevice.isNetworkConnect {
@@ -104,13 +104,8 @@ func netWorkRequest(_ target: Module1API, completion: @escaping successCallback,
         switch result {
             
         case let .success(response):
-            do {
-                
                 
                 completion(String(data: response.data, encoding: String.Encoding.utf8)!)
-            } catch {
-                
-            }
         case let .failure(error):
             print("请求失败\(error)")
         }
