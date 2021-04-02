@@ -21,16 +21,7 @@ struct ContentView: View {
     }
     
     func sendRequest() {
-        
-        print("开始发送请求")
-        
-//        netWorkRequest(.easyRequest, completion: { (responseStr) in
-//
-//            print(responseStr)
-//        }, failed: { (failedRes) in
-//
-//        })
-        
+                
         var params = [String:Any]()
         params["token"] = "s4qrhtuypfnw3qo3mjj63pw4pw"
         params["channel_id"] = 362
