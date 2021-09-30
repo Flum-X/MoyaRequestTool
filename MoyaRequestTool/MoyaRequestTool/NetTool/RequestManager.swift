@@ -14,14 +14,14 @@ import Moya
 
 private var requestTimeout: Double = 30
 
-typealias successCallback = ((String)->Void)
+typealias successCallback = ([String:Any]?)->Void
 
-typealias failureCallback = ((String)->Void)
+typealias failureCallback = (DXError)->Void
 
 typealias errorCallback = (()->Void)
 
 
-private let myEndpointClosure = { (target: Module1API) -> Endpoint in
+private let myEndpointClosure = { (target: RequestAPI) -> Endpoint in
     
     let url = target.baseURL.absoluteString + target.path
     var task = target.task
@@ -77,20 +77,10 @@ private let networkPlugin = NetworkActivityPlugin.init { (changeType, _) in
 }
 
 //网络请求发送的核心初始化方法，创建网络请求对象
-let provider = MoyaProvider<Module1API>(endpointClosure: myEndpointClosure, requestClosure: requestClosure,  plugins: [networkPlugin], trackInflights: false)
-
-func networkRequest(_ target: Module1API, completion: @escaping successCallback) {
-    
-    netWorkRequest(target, completion: completion, failed: nil, errorResult: nil)
-}
-
-func netWorkRequest(_ target: Module1API, completion: @escaping successCallback, failed: failureCallback?) {
-    
-    netWorkRequest(target, completion: completion, failed: failed, errorResult: nil)
-}
+let provider = MoyaProvider<RequestAPI>(endpointClosure: myEndpointClosure, requestClosure: requestClosure,  plugins: [networkPlugin], trackInflights: false)
 
 @discardableResult //用于禁止显示 Result unused 警告的一个属性
-func netWorkRequest(_ target: Module1API, completion: @escaping successCallback, failed: failureCallback?, errorResult: errorCallback?) -> Cancellable? {
+func netWorkRequest(_ target: RequestAPI, completion: @escaping successCallback, failed: failureCallback? = nil, errorResult: errorCallback? = nil) -> Cancellable? {
     
     if !UIDevice.isNetworkConnect {
         print("请检查您的网络是否正常连接")
@@ -104,16 +94,42 @@ func netWorkRequest(_ target: Module1API, completion: @escaping successCallback,
         switch result {
             
         case let .success(response):
-                
-                completion(String(data: response.data, encoding: String.Encoding.utf8)!)
+            guard let dataDic = String.toDictionaryFrom(jsonStr: String(data: response.data, encoding: String.Encoding.utf8) ?? "") else {
+                completion([:])
+                return
+            }
+            completion(dataDic)
         case let .failure(error):
-            print("请求失败\(error)")
+            let code = ErrorCode.init(rawValue: Int(error.errorCode)) ?? .unknow
+            failed?(DXError.init(code, error.localizedDescription))
         }
         
     }
 }
 
-
+extension String {
+    
+    static func toDictionaryFrom(jsonStr: String) -> [String: Any]? {
+      if jsonStr.isEmpty {
+        return nil
+      }
+      
+      guard let jsonData = jsonStr.data(using: .utf8) else {
+        return nil
+      }
+      
+      do {
+        let dic = try JSONSerialization.jsonObject(with: jsonData, options: .mutableContainers) as? [String: Any]
+        
+        return dic
+        
+      } catch {
+        debugPrint("json解析失败")
+      }
+      
+      return nil
+    }
+}
 
 
 

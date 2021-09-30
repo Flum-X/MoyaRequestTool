@@ -1,34 +1,15 @@
 //
-//  API.swift
+//  RequestAPI+TargetType.swift
 //  MoyaRequestTool
-//
-//  Created by DaXiong on 2020/7/20.
-//  Copyright © 2020 DaXiong. All rights reserved.
+//  Target协议实现
+//  Created by Flum on 2021/9/30.
+//  Copyright © 2021 DaXiong. All rights reserved.
 //
 
 import Foundation
 import Moya
-import Alamofire
 
-//Get请求参数编码
-struct BracketLessGetEncoding: ParameterEncoding {
-    
-    func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
-        var request = try URLEncoding().encode(urlRequest, with: parameters)
-        request.url = URL(string: request.url!.absoluteString.replacingOccurrences(of: "%5B%5D=", with: "="))
-        return request
-    }
-}
-
-enum Module1API {
-    
-    case easyAPI
-    case basicGetAPI(parameters:[String:Any])
-    case basicPostAPI(parameters:[String:Any])
-}
-
-
-extension Module1API: TargetType {
+extension RequestAPI: TargetType {
     
     var baseURL: URL {
         return URL(string: moyaBaseUrl)!
